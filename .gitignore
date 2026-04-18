@@ -1,41 +1,220 @@
-# Prerequisites
-*.d
+#include<iostream>
+#include<vector>
+#include<fstream>
+#include<string>
+#include <cstdlib>
+#include<ctime>
+using namespace std;
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+void printmessage(string message,bool printtop=true,bool printbottom=true)
+{
+    if(printtop)
+    {
+        cout<<"+---------------------------------+"<<endl;
+    }else{
 
-# Precompiled Headers
-*.gch
-*.pch
+        cout<<"|";
+    }
+    bool front=true;
+    for(int i=message.length();i<33;i++)
+    {
+        if(front)
+        {
+        message=" "+message;
+        }
+        else
+        {
+            message=message+" ";
+        }
+        front=!front;
+    }
+    cout<<message.c_str();
+        if(printbottom)
+    {
+        cout<<endl;
+        cout<<"+---------------------------------+"<<endl;
 
-# Linker files
-*.ilk
+    }else{
+                cout<<"|"<<endl;
 
-# Debugger Files
-*.pdb
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+    }
 
-# Fortran module files
-*.mod
-*.smod
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
+}
+void drawhangman(int gusscount=0)
+{
+    if(gusscount>=1)
+    {
 
-# Executables
-*.exe
-*.out
-*.app
+        printmessage("|",false,false);
+    }else{
 
-# debug information files
-*.dwo
+    printmessage("",false,false);
+    }
+
+
+
+
+    if(gusscount>=2)
+        printmessage("|",false,false);
+    else
+        printmessage("",false,false);
+
+
+
+
+    if(gusscount>=3)
+    {
+
+        printmessage("0",false,false);
+    }else{
+
+    printmessage("",false,false);
+    }
+
+
+
+   if(gusscount==4)
+    printmessage("/  ",false,false);
+
+
+
+   if(gusscount==5)
+    printmessage("/| ",false,false);
+
+
+   if(gusscount>=6)
+    printmessage("/|\\",false,false);
+   else
+    printmessage("",false,false);
+
+
+    if(gusscount>=7)
+        printmessage("|",false,false);
+    else
+        printmessage("",false,false);
+
+
+    if(gusscount==8)
+        printmessage("/",false,false);
+
+    if(gusscount>=9)
+    printmessage("/ \\",false,false);
+   else
+    printmessage("",false,false);
+
+}
+void printletters(string input,char from,char to)
+{
+    string s;
+    for(char i=from;i<=to;i++)
+    {
+
+        if (input.find(i) == std::string::npos)
+            {
+            s+=i;
+            s+=" ";
+
+            }
+        else
+           s+=" ";
+    }
+    printmessage(s,false,false);
+}
+void printavailableletters(string taken)
+{
+    printmessage("availeble letters");
+    printletters("taken",'A','M');
+    printletters("taken",'N','Z');
+}
+bool printwordandcheckwin(string word,string guessed)
+{
+    bool won=true;
+    string s;
+    for(int i=0;i<word.length();i++)
+    {
+        if(guessed.find(word[i])==std::string::npos)
+        {
+            won=false;
+            s+="_ ";
+        }else{
+
+        s+=word[i];
+        s+=" ";
+
+        }
+    }
+    printmessage(s,false);
+    return won;
+}
+string loadrandomword(string path)
+{
+    vector<string> v;
+    string word;
+    ifstream reader(path.c_str());
+
+    if(reader.is_open())
+    {
+        while(std::getline(reader, word))
+        {
+            if(!word.empty())
+                v.push_back(word);
+        }
+        reader.close();
+
+        if(!v.empty())
+        {
+            int randomline = rand() % v.size();
+            return v[randomline];
+        }
+    }
+    return "ERROR";
+}
+int triesleft(string word,string guessed)
+{
+    int error=0;
+    for(int i=0;i<guessed.length();i++)
+    {
+        if(word.find(guessed[i])==std::string::npos)
+            error++;
+    }
+    return error;
+}
+int main(){
+    srand(time(0));
+    string guesses="ABHJIKKL";
+    string wordtoguess;
+    wordtoguess=loadrandomword("word.txt");
+    int tries=0;
+    bool win=false;
+    do
+    {
+        system("cls");
+        printmessage("hangman");
+        drawhangman(tries);
+        printavailableletters(guesses);
+        printmessage("guess the word");
+       win= printwordandcheckwin(wordtoguess,guesses);
+
+
+        if(win)
+            break;
+
+        char x;
+        cout<<">";cin>>x;
+        if(guesses.find(x)==string::npos)
+            guesses+=x;
+
+        tries=triesleft(wordtoguess,guesses);
+    }while(tries<10);
+
+   if(win)
+    printmessage("YOU WON THE GAME");
+   else
+    printmessage("GAME OVER");
+
+   system("pause");
+    return 0;
+
+}
